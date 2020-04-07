@@ -45,7 +45,7 @@ def lessTrue(c):
             temp2 = clean(c.trueLine, temp2)
             temp3 = temp2 + 1
             temp3 = clean(c.trueLine, temp3)
-    return -1
+    return -3
 
 
 def check(c):
@@ -75,9 +75,10 @@ def check(c):
     # 正确程序还有剩余行
     if c.trueNum == c.trueLine.__len__() and c.falseNum != c.falseLine.__len__():
         answerDir[c.falseNum + 1] = {-1}
+    # 错误程序还有剩余行
     elif c.falseNum == c.falseLine.__len__() and c.trueNum != c.trueLine.__len__():
-        answerDir[c.falseNum + 1] = {-1}
-    print(answerDir)
+        answerDir[c.falseNum + 1] = {-2}
+    return answerDir
 
 
 class CheckCode:
@@ -90,8 +91,24 @@ class CheckCode:
     falseNum = 0
 
 
-if __name__ == '__main__':
+# path1:正确程序路径
+# path2:错误程序路径
+# checkDir:错误行数字典
+#       key:    错误行数
+#       value:  0       //单行逻辑错误
+#               -1      //正确程序有剩余行
+#               -2      //错误程序有剩余行
+#               -3      //多行缺失，可能存在问题
+#               其他正数 //相较于正确程序的缺失行数
+def checkMain(path1, path2):
     ck = CheckCode()
-    ck.trueLine = getLine("OldFile")
-    ck.falseLine = getLine("NewFile")
-    check(ck)
+    ck.trueLine = getLine(path1)
+    ck.falseLine = getLine(path2)
+    checkDir = check(ck)
+    print(checkDir)
+
+# if __name__ == '__main__':
+#     ck = CheckCode()
+#     ck.trueLine = getLine("OldFile")
+#     ck.falseLine = getLine("NewFile")
+#     check(ck)
