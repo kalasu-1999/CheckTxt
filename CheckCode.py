@@ -2,15 +2,15 @@
 # 文件多行不同判断
 
 
-def clean(line, num):
-    while line[num].strip() == '':
-        num = num + 1
-    return num
-
-
 def getLine(path):
     file = open(path, 'r')
     return file.readlines()
+
+
+def clean(line, num):
+    while num < line.__len__() and line[num].strip() == '':
+        num = num + 1
+    return num
 
 
 def logic(c):
@@ -23,7 +23,7 @@ def logic(c):
         temp2 = c.falseNum
         clean(c.trueLine, temp1)
         clean(c.falseLine, temp2)
-    if c.trueLine[temp1 + 1] == c.falseLine[temp2 + 1]:
+    if c.trueLine[temp1 + 1].replace(' ', '') == c.falseLine[temp2 + 1].replace(' ', ''):
         return True
     else:
         return False
@@ -38,7 +38,8 @@ def lessTrue(c):
     temp3 = temp2 + 1
     temp3 = clean(c.trueLine, temp3)
     while temp3 != c.trueLine:
-        if c.trueLine[temp2] == c.falseLine[c.falseNum] and c.trueLine[temp3] == c.falseLine[temp1]:
+        if c.trueLine[temp2].replace(' ', '') == c.falseLine[c.falseNum].replace(' ', '') and \
+                c.trueLine[temp3].replace(' ', '') == c.falseLine[temp1].replace(' ', ''):
             return temp2
         else:
             temp2 = temp2 + 1
@@ -50,35 +51,37 @@ def lessTrue(c):
 
 def check(c):
     # 去空行
-    answerDir = {}
+    answerDict = {}
     clean(c.trueLine, c.trueNum)
     clean(c.falseLine, c.falseNum)
-    while c.trueNum != c.trueLine.__len__() or c.falseNum != c.falseLine.__len__():
+    while c.trueNum < c.trueLine.__len__() and c.falseNum < c.falseLine.__len__():
         # 相同行继续
-        if c.trueLine[c.trueNum] == c.falseLine[c.falseNum]:
+        if c.trueLine[c.trueNum].replace(' ', '') == c.falseLine[c.falseNum].replace(' ', ''):
             c.trueNum = c.trueNum + 1
             c.falseNum = c.falseNum + 1
         # 不同行
         else:
             # 判断是否为逻辑错误
             if logic(c):
-                answerDir[c.falseNum + 1] = {0}
+                answerDict[c.falseNum] = 0
                 c.trueNum = c.trueNum + 1
                 c.falseNum = c.falseNum + 1
             else:
                 lessReturn = lessTrue(c)
                 if lessReturn != 0:
-                    answerDir[c.falseNum + 1] = {lessReturn - c.trueNum}
+                    answerDict[c.falseNum] = lessReturn - c.trueNum
                     c.trueNum = lessReturn + 1
                     c.falseNum = c.falseNum + 1
+        c.trueNum = clean(c.trueLine, c.trueNum)
+        c.falseNum = clean(c.falseLine, c.falseNum)
     # 运行到最后有剩余行
     # 正确程序还有剩余行
     if c.trueNum == c.trueLine.__len__() and c.falseNum != c.falseLine.__len__():
-        answerDir[c.falseNum + 1] = {-1}
+        answerDict[c.falseNum] = -1
     # 错误程序还有剩余行
     elif c.falseNum == c.falseLine.__len__() and c.trueNum != c.trueLine.__len__():
-        answerDir[c.falseNum + 1] = {-2}
-    return answerDir
+        answerDict[c.falseNum] = -2
+    return answerDict
 
 
 class CheckCode:
@@ -107,8 +110,6 @@ def checkMain(path1, path2):
     checkDir = check(ck)
     print(checkDir)
 
-# if __name__ == '__main__':
-#     ck = CheckCode()
-#     ck.trueLine = getLine("OldFile")
-#     ck.falseLine = getLine("NewFile")
-#     check(ck)
+
+if __name__ == '__main__':
+    checkMain("OldFile", "NewFile")
